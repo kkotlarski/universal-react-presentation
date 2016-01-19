@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Building universal React applications</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+		<style>
+			.reveal pre {
+				width: 100%;
+			}
+			.reveal pre code {
+				max-height: 550px;
+			}
+			abbr {
+				border-bottom: 1px dotted #fff !important;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Building universal React applications</h1>
+					<p>
+						<small>Created by <a href="mailto:krzysztof@kotlarski.net">Krzysztof Kotlarski</a><br><a href="mailto:krzysztof@kotlarski.net">krzysztof@kotlarski.net</a></small>
+					</p>
+				</section>
+
+			<section>
+				<section>
+					<h2>Why React</h2>
+					<ul>
+						<li>Simple</li>
+						<li>Easy to extend</li>
+						<li>Server side rendering</li>
+						<li>Fast (?)</li>
+						<li>Light (?)</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Light (?)</h3>
+					<table>
+						<tr>
+							<td>React 0.14.6</td><td>132 KB</td>
+						</tr>
+						<tr>
+							<td>React <abbr title="
+React 0.14.6 (132 KB)
+React DOM 0.14.6 (706 B)
+Redux 3.0.5 (5.3 KB)
+react-redux 4.0.6 (8.0 KB)
+react-router 1.0.3 (43.1 KB)
+fetch 0.10.1 (7.1 KB)
+							">stack</abbr></td><td>196.2 KB</td>
+						</tr>
+						<tr>
+							<td>Angular <abbr title="
+angular 1.4.8 (145 KB)
+ui-router 0.2.15 (29.7 KB)
+							">stact</td><td>174.7 KB</td>
+						</tr>
+						<tr>
+							<td>Angular 2.0 <abbr title="
+angular 2.0.0 beta 0 (566 KB)
+angular-http (26.0 KB)
+angular-router (65.5 KB)
+							">stack</abbr><td>657.5 KB</td>
+						</tr>
+						<tr>
+							<td>Backbone <abbr title="
+Backbone 1.2.3 (22.6 KB)
+underscore 1.8.3 (16.1 KB)
+jquery 2.2.0 (83.6 KB)
+								">stack</abbr></td><td>122.3 KB</td>
+						</tr>
+					</table>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Getting started</h2>
+					<h4>Requirements</h4>
+					<ul>
+						<li>write once, run everywhere</li>
+						<li>easy to setup</li>
+						<li>easy to maintain</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Getting started</h2>
+					<h4>Solution</h4>
+					<ul>
+						<li>React</li>
+						<li>ES6+</li>
+						<li>webpack</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Getting started - universal</h2>
+					<pre><code data-trim>
+import React from 'react';
+
+export default class StartPage extends React.Component {
+	render() {
+		const {user} = this.props;
+		return &lt;p&gt;Welcome {user.name}&lt;/p&gt;;
+	}
+}
+					</code></pre>
+				</section>
+				<section>
+					<h2>Getting started - client</h2>
+					<pre><code data-trim>
+import ReactDOM from 'react-dom';
+import StartPage from './src/page/startPage';
+
+const user = {name: 'React event'};
+const container = document.getElementById('body');
+
+ReactDOM.render(&lt;StartPage user={user} /&gt;, container);
+					</code></pre>
+				</section>
+				<section>
+					<h2>Getting started - server</h2>
+					<pre><code data-trim>
+import express from 'express';
+import React from 'react';
+import {renderToString} from 'react-dom/server';
+import StartPage from './src/page/startPage';
+
+var app = express();
+app.set('views', __dirname + '/views');
+app.use((req, res) => {
+	const user = {name: 'React event'};
+	const content = renderToString(&lt;StartPage user={user} /&gt;);
+
+    res.render('index.html', {content});
+});
+
+app.listen();
+					</code></pre>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Routing</h2>
+					<h4>Requirements</h4>
+					<ul>
+						<li>complete solution</li>
+						<li>support SPA</li>
+					</ul>
+					<h4><br />Solution</h4>
+					<p>react-router</p>
+				</section>
+				<section>
+					<h2>Routing - universal</h2>
+					<pre><code data-trim>
+import React from 'react';
+import {IndexRoute, Route} from 'react-router';
+import App from './app';
+import StartPage from './page/startPage';
+import Page1 from './page/page1';
+import Page2 from './page/page2';
+import Subpage from './page/subpage';
+
+var routes = (
+    &lt;Route path="/" component={App}&gt;
+        &lt;IndexRoute component={StartPage} /&gt;
+        &lt;Route path='map' component={Page1} /&gt;
+        &lt;Route path='events' component={Page2}&gt;
+	        &lt;Route path=':id' component={Subpage} /&gt;
+	    &lt;/Route&gt;
+    &lt;/Route&gt;
+);
+
+export default routes;
+					</code></pre>
+				</section>
+				<section>
+					<h2>Routing - client</h2>
+					<pre><code data-trim>
+//...
+import Router from 'react-router';
+import createBrowserHistory from 'history/lib/createBrowserHistory';
+import routes from './src/routes';
+
+//...
+var history = createBrowserHistory();
+
+ReactDOM.render(&lt;Router history={history} routes={routes} /&gt;, container);
+					</code></pre>
+				</section>
+				<section>
+					<h2>Routing - server</h2>
+					<pre><code data-trim>
+//...
+import {match, RoutingContext} from 'react-router';
+import routes from './src/routes';
+
+//...
+app.use((req, res) => {
+  match({
+    routes,
+    location: req.url
+  }, (error, redirectLocation, renderProps) => {
+    if (error) {
+      res.status(500).send(error.message);
+    } else if (redirectLocation) {
+      res.redirect(302, redirectLocation.pathname + redirectLocation.search);
+    } else if (renderProps) {
+      const content = renderToString(&lt;RoutingContext {...renderProps} /&gt;),
+      res.render('index.html', {content});
+    } else {
+      res.status(404).send('Not found');
+    }
+  });
+});
+//...
+					</code></pre>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Data</h2>
+					<h4>Requirements</h4>
+					<ul>
+						<li>store application state</li>
+						<li>share date between components</li>
+						<li>allow multiple instances</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Data</h2>
+					<h4>Solution</h4>
+					<ul>
+						<li style="text-decoration: line-through;">Alt.js</li>
+						<li>Redux</li>
+						<li>react-redux</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Data - universal</h2>
+					<pre><code data-trim>
+import React from 'react';
+import {connect} from 'react-redux';
+
+@connect(state => ({user: state.user}))
+export default class StartPage extends React.Component {
+	render() {
+		const {user} = this.props;
+		return &lt;p&gt;Welcome {user.name}&lt;/p&gt;;
+	}
+}
+					</code></pre>
+				</section>
+				<section>
+					<h2>Data - client</h2>
+					<pre><code data-trim>
+//...
+import {Provider} from 'react-redux';
+import {createStore} from 'redux';
+import reducer from './src/reducer';
+
+//...
+const store = createStore(reducer, window.__STORE__);
+
+ReactDOM.render(&lt;Provider store={store}&gt;
+		&lt;Router history={history} routes={routes} /&gt;
+	&lt;/Provider&gt;, container);
+					</code></pre>
+				</section>
+				<section>
+					<h2>Data - server</h2>
+					<pre><code data-trim>
+//...
+import {Provider} from 'react-redux';
+import {createStore} from 'redux';
+import reducer from './src/reducer';
+
+//...
+const store = createStore(reducer);
+const content = renderToString(&lt;Provider store={store}&gt;
+		&lt;RoutingContext {...renderProps} /&gt;
+	&lt;/Provider&gt;),
+res.render('index.html', {content, store: JSON.stringify(store.getState())});
+//...
+					</code></pre>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Async data</h2>
+					<h4>Requirements</h4>
+					<ul>
+						<li>one data source with consistent API</li>
+						<li>should delay res.render() on server</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Async data</h2>
+					<h4>Solution</h4>
+					<ul>
+						<li>external REST API to provide data</li>
+						<li>stateless server</li>
+						<li>redux-thunk</li>
+						<li>wait for async redux middleware - avaliable soon at <a href="https://github.com/kkotlarski">github.com/kkotlarski</a></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Async data - universal</h2>
+					<pre><code data-trim>
+import React from 'react';
+import {connect} from 'react-redux';
+import {getUser} from './userAction';
+
+@connect(state => ({user: state.user}))
+export default class StartPage extends React.Component {
+  componentWillMount() {
+    const {dispatch} = this.props;
+    dispatch(getUser());
+  }
+
+  render() {
+    const {user} = this.props;
+    if (user.loading) {
+      return &lt;p&gt;Loading...&lt;/p&gt;;
+    } else {
+      return &lt;p&gt;Welcome {user.name}&lt;/p&gt;;
+    }
+  }
+}
+					</code></pre>
+				</section>
+				<section>
+					<h2>Async data - client</h2>
+					<pre><code data-trim>
+//...
+import thunkMiddleware from 'redux-thunk';
+import {createStore, applyMiddleware} from 'redux';
+
+//...
+const createMidlewareStore = applyMiddleware(
+	thunkMiddleware,
+)(createStore);
+const store = createMidlewareStore(reducer, window.__STORE__);
+//...
+					</code></pre>
+				</section>
+				<section>
+					<h2>Async data - server</h2>
+					<pre><code data-trim>
+import thunkMiddleware from 'redux-thunk';
+import {createStore, applyMiddleware} from 'redux';
+import waitMiddleware from './src/wait-middleware';
+
+const createMidlewareStore = applyMiddleware(
+  thunkMiddleware,
+  waitMiddleware(
+    // init
+    (store) => {},
+    // do react cycle
+    (store) => renderToString(&lt;Provider store={store}&gt;
+    		&lt;RoutingContext {...renderProps} /&gt;
+		&lt;/Provider&gt;),
+    // when done
+    (store, content) => {
+      res.render('index.html', {content, store: JSON.stringify(store.getState())});
+    }
+  )
+)(createStore);
+const store = createMidlewareStore(reducer);
+					</code></pre>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Authentication</h2>
+					<h4>Requirements</h4>
+					<ul>
+						<li>share state between server and browser</li>
+						<li>don't expose session ID/token</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Authentication - universal</h2>
+					<pre><code data-trim>
+import fetch from 'isomorphic-fetch';
+import {ASYNC_START, ASYNC_END} from '../wait-middleware';
+import {API_URL} from '../config';
+//...
+
+const AUTH_REQUEST = 'AUTH_REQUEST';
+const AUTH_SET_USER = 'AUTH_SET_USER';
+//...
+
+function authRequest(id) {
+	return {
+		type: AUTH_REQUEST,
+		meta: ASYNC_START
+	};
+}
+
+export function authSetUser(user) {
+	return {
+		type: AUTH_SET_USER,
+		payload: user,
+		meta: ASYNC_END
+	};
+}
+					</code></pre>
+				</section>
+				<section>
+					<h2>Authentication - universal</h2>
+					<pre><code data-trim>
+export function getUser(headers) {
+	return function (dispatch, getState) {
+		dispatch(authRequest());
+
+		return fetch(`${API_URL}/auth/user`, {
+			headers,
+			credentials: 'include'
+		})
+			.then(response => response.json())
+			.then(json => dispatch(authSetUser(json)))
+			.catch(error => dispatch(authSetError(error)));
+	}
+}
+//...
+					</code></pre>
+				</section>
+				<section>
+					<h2>Authentication - client</h2>
+					<p>No change required</p>
+				</section>
+				<section>
+					<h2>Authentication - server</h2>
+					<pre><code data-trim>
+//...
+import {getUser} from './src/auth';
+
+//...
+waitMiddleware(
+  // init
+  (store) => store.dispatch(getUser(req.headers)),
+
+//...
+					</code></pre>
+				</section>
+			</section>
+
+			<section>
+				<h1>Q&amp;A</h1>
+				<p>Thank you</p>
+			</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
